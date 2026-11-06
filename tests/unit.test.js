@@ -1,0 +1,88 @@
+const fs=require('fs'),assert=require('assert');
+const h=fs.readFileSync(require('path').join(__dirname,'..','index.html'),'utf8');
+const js=h.match(/<script>([\s\S]*)<\/script>/)[1];
+new Function(js.replace(/\$\(/g,'(')); // syntax only
+const gcode=js.split('/*G*/')[1].split('/*GEND*/')[0];const G=new Function(gcode+';return{flower,hash,PC}')();
+const core=js.split('/*CORE*/')[1].split('/*END*/')[0];
+let store={};global.localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=v},removeItem:k=>delete store[k]};
+const M=new Function(core+';return{load,save,validate,make,query,streak,list,fix,POS,rate,pick,mk,status,rstats,addH,loadH,ymd,usedIn,wordUse,dayData,actDays,streaks,stats,growth,ACH,wc,saveJ,loadJ,loadSet,saveSet,aiPrompt,cleanGen,fromDict,ipaInfo,respell,parseDict,pickVoice,matchHeard,ord,T}')();
+const D=o=>Object.assign({term:"",pos:"",def:"",ar:"",syn:"",ant:"",ex:"",mine:"",pron:""},o);
+let n=0;const t=(name,f)=>{f();n++;console.log("ok -",name)};
+let ws=M.load();
+t("starts empty",()=>assert.equal(ws.length,0));
+t("empty form rejected",()=>{const v=M.validate(D({}),ws,null);assert(v.e.term&&v.e.pos&&v.e.def)});
+t("non-English term rejected",()=>assert(M.validate(D({term:"ab3",pos:"noun",def:"long enough"}),ws,null).e.term));
+t("short definition rejected",()=>assert(M.validate(D({term:"calm",pos:"adjective",def:"ok"}),ws,null).e.def));
+const a=M.make(D({term:" Serendipity ",pos:"noun",def:"A happy accident.",ar:"صدفة سعيدة",syn:"luck, chance, luck",ant:"misfortune",ex:"It was serendipity.",mine:"Meeting you was serendipity.",pron:"/x/"}),null);
+t("valid word accepted",()=>assert.deepEqual(M.validate(D({term:"Serendipity",pos:"noun",def:"A happy accident.",ar:"صدفة"}),ws,null).e,{}));
+t("make trims, dedupes lists, stamps date",()=>{assert.equal(a.term,"Serendipity");assert.deepEqual(a.syn,["luck","chance"]);assert(!isNaN(Date.parse(a.added)));assert.equal(a.fav,false)});
+ws=[a];M.save(ws);
+t("persists after restart",()=>{const r=M.load();assert.equal(r.length,1);assert.equal(r[0].ar,"");assert.equal(r[0].id,a.id)});
+t("duplicate detected (case/space)",()=>{const v=M.validate(D({term:"  serendIPITY ",pos:"noun",def:"dup dup dup"}),ws,null);assert(v.e.term&&v.dup.id===a.id)});
+t("editing same word is not a duplicate",()=>assert(!M.validate(D({term:"serendipity",pos:"noun",def:"edited def"}),ws,a.id).e.term));
+const b=M.make(D({term:"ephemeral",pos:"adjective",def:"Lasting a short time.",ar:"زائل"}),null);b.added=new Date(Date.now()+5000).toISOString();
+ws=[b,a];M.save(ws);
+t("rename onto another word blocked",()=>assert(M.validate(D({term:"Ephemeral",pos:"noun",def:"clash clash"}),ws,a.id).e.term));
+t("edit keeps id/added/fav, updates fields",()=>{const f=Object.assign({},a,{fav:true});const e=M.make(D({term:"Serendipity",pos:"noun",def:"New meaning here."}),f);assert.equal(e.id,a.id);assert.equal(e.added,a.added);assert(e.fav);assert.equal(e.def,"New meaning here.")});
+t("favorite persists",()=>{ws=ws.map(w=>w.id===a.id?Object.assign({},w,{fav:true}):w);M.save(ws);assert(M.load().find(w=>w.id===a.id).fav)});
+t("search by term, Arabic, definition, my sentence",()=>{const q=s=>M.query(ws,{q:s}).map(w=>w.term);assert.deepEqual(q("EPHEM"),["ephemeral"]);assert.deepEqual(q("زائل"),[]);assert.deepEqual(q("accident"),["Serendipity"]);assert.deepEqual(q("meeting you"),["Serendipity"]);assert.equal(q("zzz").length,0)});
+t("filter by pos and favorites",()=>{assert.equal(M.query(ws,{pos:"adjective"}).length,1);assert.deepEqual(M.query(ws,{fav:true}).map(w=>w.term),["Serendipity"])});
+t("sorting",()=>{const s=k=>M.query(ws,{sort:k}).map(w=>w.term);assert.deepEqual(s("az"),["ephemeral","Serendipity"]);assert.deepEqual(s("za"),["Serendipity","ephemeral"]);assert.deepEqual(s("new"),["ephemeral","Serendipity"]);assert.deepEqual(s("old"),["Serendipity","ephemeral"]);assert.equal(s("fav")[0],"Serendipity")});
+t("delete persists",()=>{ws=ws.filter(w=>w.id!==a.id);M.save(ws);const r=M.load();assert.equal(r.length,1);assert.equal(r[0].term,"ephemeral")});
+t("streak counts today",()=>assert.equal(M.streak(ws),1));
+t("corrupt storage does not crash, is backed up",()=>{store["ww.words.v1"]="{bad";assert.deepEqual(M.load(),[]);assert.equal(store["ww.words.v1.bak"],"{bad")});
+t("blocked storage falls back to memory",()=>{global.localStorage={getItem(){throw 1},setItem(){throw 1}};assert.equal(M.save([a]),false);assert.equal(M.load().length,1)});
+t("mastered persists and survives edit",()=>{const m=Object.assign({},b,{mastered:true});M.save([m]);assert(M.load()[0].mastered);assert(M.make(D({term:"ephemeral",pos:"adjective",def:"edited text"}),m).mastered);assert.equal(M.make(D({term:"new",pos:"noun",def:"fresh word"}),null).mastered,false)});
+t("every POS draws a bud and a bloom, no bad numbers",()=>{M.POS.forEach(p=>[false,true].forEach(m=>{const s=G.flower({pos:p,mastered:m,id:"x"},true);assert(s.startsWith("<svg")&&s.endsWith("</svg>")&&!/NaN|undefined/.test(s))}));assert(G.flower({pos:"noun",mastered:true}).length!==G.flower({pos:"noun",mastered:false}).length)});
+t("bloom styles differ by category",()=>{const s=new Set(["noun","verb","adjective","adverb","phrase"].map(p=>G.flower({pos:p,mastered:true})));assert.equal(s.size,5)});
+t("hash is stable",()=>assert.equal(G.hash("abc"),G.hash("abc")));
+const W=(i,o)=>M.fix(Object.assign({id:"w"+i,term:"word"+i,pos:"noun",def:"Meaning number "+i+" here.",syn:["syn"+i],ant:["ant"+i],ex:"This is word"+i+" in a sentence.",mine:""},o||{}));
+const now=Date.now(),DAY=864e5;
+t("rate: good promotes and schedules later",()=>{const r=M.rate(W(1),"good",now);assert.equal(r.box,1);assert.equal(r.ok,1);assert.equal(Date.parse(r.due)-now,DAY);assert.equal(M.status(r),"learning")});
+t("rate: bad drops two boxes, due now, unmasters",()=>{const w=W(1,{box:4,ok:4,mastered:true});const r=M.rate(w,"bad",now);assert.equal(r.box,2);assert.equal(r.bad,1);assert.equal(r.mastered,false);const z=M.rate(W(2),"bad",now);assert.equal(z.box,0);assert.equal(Date.parse(z.due),now)});
+t("rate: hard keeps box; reaching box 4 blooms",()=>{assert.equal(M.rate(W(1,{box:2}),"hard",now).box,2);const r=M.rate(W(1,{box:3,ok:3}),"good",now);assert.equal(r.box,4);assert(r.mastered);assert.equal(M.status(r),"mastered")});
+t("new word is due immediately; status new",()=>{const w=W(1);assert(Date.parse(w.due)<=Date.now()+1000);assert.equal(M.status(w),"new")});
+t("pick: due before not-due, difficult before easy",()=>{const far=new Date(now+9*DAY).toISOString(),past=new Date(now-DAY).toISOString();
+ const hard=W(1,{ok:0,bad:5,box:0,due:past}),easy=W(2,{ok:6,bad:0,box:3,due:past}),later=W(3,{ok:0,bad:6,due:far});
+ assert.deepEqual(M.pick([easy,later,hard],2,now,()=>0).map(w=>w.id),["w1","w2"]);
+ let h=0;for(let i=0;i<200;i++)if(M.pick([easy,hard],1,now,Math.random)[0].id==="w1")h++;assert(h>150,"hard shown "+h+"/200")});
+const pool=[1,2,3,4,5,6].map(i=>W(i,{box:i%4,ex:"A sentence using word"+i+" properly.",mine:"I wrote word"+i+" today."}));
+t("questions are well-formed across 600 draws",()=>{const seen=new Set();for(let i=0;i<600;i++){const w=pool[i%6],q=M.mk(w,pool,Math.random);seen.add(q.t);assert.equal(q.id,w.id);if(q.t==="flash")continue;
+ assert(q.o.includes(q.a),q.t+" answer missing");assert.equal(new Set(q.o).size,q.o.length);assert(q.o.length>=2&&q.o.length<=4);
+ if(q.t==="cloze"){assert(q.b.includes("_____")&&!q.b.toLowerCase().includes(w.term));assert.equal(q.a,w.term)}
+ if(q.t==="syn"){assert(w.syn.includes(q.a));assert(!q.o.some(o=>o!==q.a&&w.syn.includes(o)||o===w.term))}
+ if(q.t==="e2d")assert.equal(q.a,w.def);if(q.t==="d2w")assert.equal(q.a,w.term)}
+ assert.deepEqual([...seen].sort(),["cloze","d2w","e2d","flash","syn"])});
+t("single-word journal falls back to flashcards",()=>assert.equal(M.mk(W(1,{box:3,syn:[],ant:[]}),[W(1)],Math.random).t,"flash"));
+t("word without a matching sentence skips cloze",()=>{const w=W(1,{box:3,ex:"No match here.",mine:""});for(let i=0;i<100;i++)assert.notEqual(M.mk(w,[w].concat(pool),Math.random).t,"cloze")});
+t("review history persists and summarises",()=>{store={};global.localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=v}};M.addH([{w:"a",t:new Date().toISOString(),k:"e2d",r:"good"},{w:"b",t:new Date().toISOString(),k:"d2w",r:"bad"}]);const h=M.loadH();assert.equal(h.length,2);const s=M.rstats(h,Date.now());assert.equal(s.total,2);assert.equal(s.acc,50);assert.equal(s.streak,1);assert.equal(s.days[6][1],2)});
+t("old saved words gain review fields on load",()=>{store={"ww.words.v1":JSON.stringify([{id:"x",term:"old",pos:"noun",def:"An older entry."}])};const r=M.load()[0];assert.equal(r.box,0);assert.equal(r.ok,0);assert(r.due)});
+const WS=[W(1,{term:"lantern"}),W(2,{term:"hush"}),W(3,{term:"gleam"})];
+t("usedIn finds words and simple inflections, not substrings",()=>{assert.deepEqual(M.usedIn("The Lanterns gleamed; hushing lantern",WS).sort(),["w1","w2","w3"]);assert.deepEqual(M.usedIn("lanternfish unhushed",WS),[])});
+t("wordUse counts entries and first date",()=>{const u=M.wordUse([{date:"2026-11-02",title:"",body:"a lantern"},{date:"2026-11-01",title:"x",body:"lantern and hush"}],WS);assert.equal(u.w1.n,2);assert.equal(u.w1.first,"2026-11-01");assert.equal(u.w2.n,1);assert(!u.w3)});
+t("journal and goal persist",()=>{store={};global.localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=v}};M.saveJ([{id:"e",date:"2026-11-02",title:"t",body:"b"}]);assert.equal(M.loadJ()[0].id,"e");assert.equal(M.loadSet().goal,10);M.saveSet({goal:20});assert.equal(M.loadSet().goal,20)});
+t("streaks: current and longest from real days",()=>{const n=new Date(2026,10,10,12).getTime();const s={"2026-11-10":1,"2026-11-09":1,"2026-11-08":1,"2026-11-03":1,"2026-11-02":1,"2026-11-01":1,"2026-10-31":1,"2026-10-30":1};let r=M.streaks(s,n);assert.equal(r.cur,3);assert.equal(r.best,3+0>5?3:Math.max(3,5));delete s["2026-11-10"];r=M.streaks(s,n);assert.equal(r.cur,2);assert.equal(M.streaks({},n).cur,0)});
+t("streak survives a gap-free month boundary",()=>assert.equal(M.streaks({"2026-10-31":1,"2026-11-01":1},new Date(2026,10,1,9).getTime()).cur,2));
+t("dayData groups by local day",()=>{const d=new Date(2026,10,5,23,30),k=M.ymd(d);const ws=[W(1,{added:d.toISOString()}),W(2,{added:new Date(2026,10,6,0,10).toISOString()})];const dd=M.dayData(k,ws,[{w:"w1",t:d.toISOString(),k:"e2d",r:"good"}],[{date:k,body:"x"},{date:"2026-11-06",body:"y"}]);assert.equal(dd.added.length,1);assert.equal(dd.rev.length,1);assert.equal(dd.writ.length,1)});
+t("stats and achievements come from saved data",()=>{const n=Date.now(),ws=[W(1,{term:"lantern",mastered:true}),W(2,{term:"hush"})],h=[{w:"w1",t:new Date().toISOString(),k:"flash",r:"good"}],es=[{date:M.ymd(new Date()),title:"",body:"A lantern and a hush "+"x ".repeat(10)}];const s=M.stats(ws,h,es,n);assert.deepEqual([s.words,s.mastered,s.reviews,s.entries,s.used],[2,1,1,1,2]);assert.equal(s.written,15);assert(s.streak>=1);const earned=M.ACH.filter(a=>s[a[2]]>=a[3]).map(a=>a[0]);assert(earned.includes("First word")&&earned.includes("First bloom")&&earned.includes("First walk")&&earned.includes("Dear diary")&&!earned.includes("Ten words"))});
+t("growth is cumulative and ends at the total",()=>{const n=Date.now(),ws=[W(1,{added:new Date(n-3*864e5).toISOString()}),W(2,{added:new Date(n).toISOString()})],g=M.growth(ws,n,30);assert.equal(g.length,30);assert.equal(g[29][1],2);assert.equal(g[0][1],0);for(let i=1;i<30;i++)assert(g[i][1]>=g[i-1][1])});
+t("IPA analysis: syllables and stress from real dictionary IPA",()=>{const c=[["/ˈlæn.tən/",2,1],["/bəˈnɑː.nə/",3,2],["/ˈfəʊ.tə.ɡrɑːf/",3,1],["/fəˈtɒɡ.rə.fi/",4,2],["/hʌʃ/",1,1],["/sɪˈriːn/",2,2],["/ˈwʌndəfəl/",3,1],["/ɪˈfɛm(ə)ɹəl/",3,2]];c.forEach(([i,s,st])=>{const r=M.ipaInfo(i);assert.deepEqual([r.syl,r.stress],[s,st],i)});assert.deepEqual(M.ipaInfo(""),{syl:0,stress:0})});
+t("easy spelling is derived from IPA",()=>{assert.equal(M.respell("/ˈlæn.tən/"),"LAN-tuhn");assert.equal(M.respell("/sɪˈriːn/"),"sih-REEN");assert.equal(M.respell("/hʌʃ/"),"huhsh");assert.equal(M.respell("/fəˈtɒɡ.rə.fi/"),"fuh-TOG-ruh-fee");assert.equal(M.respell(""),"")});
+t("dictionary parsing keeps UK/US audio and IPA separate, invents nothing",()=>{const o=M.parseDict([{phonetic:"/x/",phonetics:[{text:"/ˈlæn.tən/",audio:"https://a/lantern-uk.mp3"},{text:"/ˈlæn.tɚn/",audio:"https://a/lantern-us.mp3"}]}]);assert.deepEqual([o.ipaUK,o.ipaUS,o.audioUK,o.audioUS,o.ipa],["/ˈlæn.tən/","/ˈlæn.tɚn/","https://a/lantern-uk.mp3","https://a/lantern-us.mp3","/ˈlæn.tən/"]);const e=M.parseDict([{phonetics:[{text:"",audio:""}]}]);const K=o=>["ipa","ipaUK","ipaUS","audioUK","audioUS"].map(k=>o[k]);assert.deepEqual(K(e),["","","","",""]);assert.deepEqual(K(M.parseDict(null)),["","","","",""]);assert.deepEqual(M.parseDict(null).meanings,[])});
+t("voice selection by accent",()=>{const v=[{lang:"en-US",name:"S"},{lang:"en_GB",name:"D"},{lang:"fr-FR",name:"F"}];assert.equal(M.pickVoice(v,"uk").name,"D");assert.equal(M.pickVoice(v,"us").name,"S");assert.equal(M.pickVoice([{lang:"en-AU"}],"uk"),null);assert.equal(M.pickVoice([],"us"),null)});
+t("speech match tolerance",()=>{assert(M.matchHeard("Lantern",["lantern"]));assert(M.matchHeard("lantern",["the lantern."]));assert(M.matchHeard("hush",["harsh","Hush!"]));assert(!M.matchHeard("lantern",["banter"]));assert(!M.matchHeard("lantern",[]))});
+t("ordinals and new validation",()=>{assert.deepEqual([1,2,3,4,11,12,21].map(M.ord),["1st","2nd","3rd","4th","11th","12th","21st"]);assert(M.validate(D({term:"calm",pos:"noun",def:"free of stress",syl:"20"}),[],null).e.syl);assert(M.validate(D({term:"calm",pos:"noun",def:"free of stress",syl:"2",stress:"3"}),[],null).e.stress);assert.deepEqual(M.validate(D({term:"calm",pos:"noun",def:"free of stress",syl:"2",stress:"1"}),[],null).e,{})});
+t("old words gain pronunciation defaults; new fields persist through edit",()=>{store={"ww.words.v1":JSON.stringify([{id:"x",term:"old",pos:"noun",def:"An older entry."}])};global.localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=v}};const r=M.load()[0];assert.deepEqual([r.ipaUK,r.audioUS,r.syl,r.pr],["","",0,{}]);const e=M.make(D({term:"old",pos:"noun",def:"edited entry",ipaUK:" /əʊld/ ",syl:"1"}),Object.assign({},r,{pr:{n:2,done:true}}));assert.equal(e.ipaUK,"/əʊld/");assert.equal(e.syl,1);assert.equal(e.pr.n,2);assert.equal(M.loadSet().accent,"uk")});
+
+t("AI prompt asks for the right things and never for IPA",()=>{const p=M.aiPrompt("serene");assert(p.includes("“serene”")&&p.includes("JSON")&&p.includes("not_a_word")&&/Do NOT include pronunciation, IPA/.test(p)&&!/Arabic/i.test(p));assert(M.POS.every(x=>p.includes(x)))});
+t("AI output is sanitised: valid entry passes",()=>{const r=M.cleanGen({pos:"Adjective",definition:"Calm, peaceful, and untroubled.",synonyms:["calm","tranquil","calm","serene"," peaceful "],antonyms:[],example:"The lake was serene at dawn."},"serene");assert(r.ok);assert.deepEqual(r.f.syn,["calm","tranquil","peaceful"]);assert.deepEqual(r.f.ant,[]);assert.equal(r.f.pos,"adjective");assert.deepEqual(r.w,[])});
+t("AI output is sanitised: bad pos, short def, example without the word",()=>{const r=M.cleanGen({pos:"exclamation",definition:"no",synonyms:"x",antonyms:null,example:"A completely different sentence."},"serene");assert(r.ok&&r.f.pos===""&&r.f.def===""&&r.f.ex===""&&r.f.syn.length===0);assert.deepEqual(r.w.sort(),["def","ex","pos"])});
+t("AI output: not-a-word and junk handled",()=>{assert.equal(M.cleanGen({error:"not_a_word"},"zzq").err,"not_a_word");assert.equal(M.cleanGen(null,"x").ok,false);assert.equal(M.cleanGen("text","x").ok,false)});
+t("inflected example accepted",()=>assert.equal(M.cleanGen({pos:"verb",definition:"To shine softly.",example:"Stars gleamed above the quiet sea."},"gleam").f.ex,"Stars gleamed above the quiet sea."));
+t("dictionary fallback entry built from real meanings only",()=>{const o=M.parseDict([{meanings:[{partOfSpeech:"adjective",synonyms:["calm"],antonyms:["stormy"],definitions:[{definition:"Calm and peaceful.",synonyms:["tranquil"],example:"A serene smile."},{definition:"Other sense."}]}]}]);const f=M.fromDict(o,"serene");assert.deepEqual([f.pos,f.def,f.ex],["adjective","Calm and peaceful.","A serene smile."]);assert.deepEqual(f.syn,["calm","tranquil"]);assert.deepEqual(f.ant,["stormy"]);assert.equal(M.fromDict(M.parseDict([]),"x"),null);assert.equal(M.fromDict(M.parseDict([{meanings:[{partOfSpeech:"noun",definitions:[{definition:"A thing here.",example:"No match."}]}]}]),"gizmo").ex,"")});
+t("new words carry no Arabic; existing Arabic data is preserved untouched",()=>{const n=M.make(D({term:"calm",pos:"adjective",def:"Free of stress."}),null);assert.equal(n.ar,"");const e=M.make(D({term:"old",pos:"noun",def:"An older entry."}),{id:"x",ar:"قديم",added:"2026-01-01T00:00:00.000Z",fav:false,mastered:false,box:0,ok:0,bad:0,last:"",due:"2026-01-01T00:00:00.000Z",pr:{}});assert.equal(e.ar,"قديم");assert(!M.query([n],{q:"قديم"}).length)});
+
+// DOM id cross-check
+const ids=[...js.matchAll(/\$\("#([\w-]+)"\)/g)].map(x=>x[1]);const missing=[...new Set(ids)].filter(i=>!h.includes('id="'+i+'"'));
+t("all #ids used by script exist (missing: "+(missing.join(",")||"none")+")",()=>assert.equal(missing.length,0));
+console.log(n+" checks passed");
