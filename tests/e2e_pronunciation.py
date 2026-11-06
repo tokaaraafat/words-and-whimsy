@@ -115,8 +115,8 @@ with sync_playwright() as p:
         for h in ["#library","#study","#garden"]:
             go(h);chk(f"no h-scroll {wd} {h}",ev("document.documentElement.scrollWidth-innerWidth")<=1,str(ev("document.documentElement.scrollWidth-innerWidth")))
         go("#library");card("lantern").locator("summary").click() if not ev("document.querySelector('.dict[open]')") else None;chk(f"details open no h-scroll {wd}",ev("document.documentElement.scrollWidth-innerWidth")<=1)
-        pg.click('#vLib .libhead [data-act=add]');pg.click("[data-act=manual]");pg.click("#pdet summary");chk(f"form pronunciation block fits {wd}",ev("document.getElementById('dlg').scrollWidth<=document.getElementById('dlg').clientWidth+1"));pg.screenshot(path=f"s_form{wd}.png");pg.click("#dlg [data-act=close]")
-        card("lantern").evaluate("c=>c.querySelector('.dict').open=true");card("lantern").locator('[data-act=prac]').click();chk(f"practice dialog fits {wd}",ev("(()=>{var r=document.getElementById('dpr').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1})()"));pg.screenshot(path=f"s_prac{wd}.png");pg.click("#dpr [data-act=close]")
+        pg.click('#vLib .libhead [data-act=add]');pg.click("[data-act=manual]");pg.click("#pdet summary");chk(f"form pronunciation block fits {wd}",ev("document.getElementById('dlg').scrollWidth<=document.getElementById('dlg').clientWidth+1"));pg.screenshot(path=f"/tmp/s_form{wd}.png");pg.click("#dlg [data-act=close]")
+        card("lantern").evaluate("c=>c.querySelector('.dict').open=true");card("lantern").locator('[data-act=prac]').click();chk(f"practice dialog fits {wd}",ev("(()=>{var r=document.getElementById('dpr').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1})()"));pg.screenshot(path=f"/tmp/s_prac{wd}.png");pg.click("#dpr [data-act=close]")
     pg.set_viewport_size({"width":1280,"height":900});go("#library");pg.evaluate("document.querySelectorAll('.dict').forEach(d=>d.open=true)");pg.wait_for_timeout(200);pg.screenshot(path="/tmp/s_dict.png",clip={"x":280,"y":0,"width":1000,"height":900})
     b.close()
 print("\n%d checks, %d failed"%(len(R),R.count(False)));print("console/page errors:",ERR[:6])

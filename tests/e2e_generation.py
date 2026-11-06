@@ -101,7 +101,7 @@ with sync_playwright() as p:
         pg.set_viewport_size({"width":wd,"height":800});ev("location.hash='#library'");pg.wait_for_timeout(100);opn();pg.fill("#f_term","serene") if False else None
         pg.click("#dlg [data-act=close]") if False else None
         pg.click("#dlg [data-act=close]");pg.click('button[aria-label="Edit serene"]');pg.click("#pdet summary") if not ev("document.getElementById('pdet').open") else None
-        chk(f"form fits at {wd}",ev("document.getElementById('dlg').scrollWidth<=document.getElementById('dlg').clientWidth+1") and ev("document.documentElement.scrollWidth-innerWidth")<=1);pg.screenshot(path=f"s_gen{wd}.png");pg.click("#dlg [data-act=close]")
+        chk(f"form fits at {wd}",ev("document.getElementById('dlg').scrollWidth<=document.getElementById('dlg').clientWidth+1") and ev("document.documentElement.scrollWidth-innerWidth")<=1);pg.screenshot(path=f"/tmp/s_gen{wd}.png");pg.click("#dlg [data-act=close]")
     pg.set_viewport_size({"width":1280,"height":900});ev("location.hash='#library'");pg.wait_for_timeout(100);opn();gen("serene") if False else None;pg.click("#dlg [data-act=close]");pg.click('button[aria-label="Edit serene"]');pg.wait_for_timeout(100);pg.screenshot(path="/tmp/s_gendesk.png")
     b.close()
 print("\n%d checks, %d failed"%(len(R),R.count(False)));print("console/page errors:",ERR[:6])
