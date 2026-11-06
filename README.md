@@ -3,6 +3,7 @@
 A personal English vocabulary journal with a vintage literary design. Type a word, press **Generate**, review the English entry, and save.
 
 ## Features
+- **Live preview**: as you type a word, the dictionary meaning, British/American IPA, easy spelling and speakers appear before you press Generate.
 - **Generate**: AI-written English entry (definition, part of speech, synonyms, antonyms, example) plus IPA and recorded audio from a dictionary source. IPA is never invented; missing data is shown as *unavailable*.
 - **Pronunciation Studio**: British/American IPA, easy spelling, syllables and stress (derived from IPA), recorded audio with device text-to-speech fallback, practice mode with optional speech recognition.
 - **Word Garden**: every word is a flower; mastered words bloom.

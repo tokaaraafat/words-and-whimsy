@@ -7,7 +7,7 @@ def chk(n,c,i=""):
     R.append(bool(c))
     if not c: print("FAIL:",n,i)
 INIT="""
-window.__prompts=[];
+window.__prompts=[];window.__spoken=[];Object.defineProperty(window,"speechSynthesis",{value:{getVoices:()=>[{lang:"en-US"},{lang:"en-GB"}],speak(u){window.__spoken.push({t:u.text,v:u.voice&&u.voice.lang});setTimeout(()=>u.onend&&u.onend(),50)},cancel(){},addEventListener(){}}});window.SpeechSynthesisUtterance=function(t){this.text=t};
 const FX={serene:{pos:'adjective',definition:'Calm, peaceful, and not disturbed by anything.',synonyms:['calm','tranquil','peaceful','placid'],antonyms:['agitated','stormy'],example:'The lake looked serene in the early morning light.'},
  offline:{pos:'adjective',definition:'Not connected to the internet right now.',synonyms:['disconnected'],antonyms:['online'],example:'My phone was offline during the long train ride home.'},
  gleam:{pos:'verb',definition:'To shine softly with a clear light.',synonyms:['glow','shine'],antonyms:[],example:'The wet stones gleam under the street lamps at night.'},
@@ -39,11 +39,17 @@ with sync_playwright() as p:
     chk("only the word is shown before generating",pg.locator("#review").is_hidden() and pg.locator("#save").is_hidden() and pg.locator("#genbtn").inner_text()=="Generate")
     pg.click("#genbtn");chk("empty word -> error, no AI call","Enter" in pg.inner_text("#e_term") and ev("__prompts.length")==0)
     pg.fill("#f_term","ab3");pg.click("#genbtn");chk("non-English text rejected before generating","English letters" in pg.inner_text("#e_term") and ev("__prompts.length")==0)
+    # live preview while typing (dictionary only, no AI call)
+    pg.fill("#f_term","serene");pg.wait_for_selector("#pv:not([hidden])",timeout=4000);t=pg.inner_text("#pv")
+    chk("typing shows meaning + pronunciation before Generate","Calm and peaceful." in t and "sɪˈriːn" in t and "sih-REEN" in t and "2 syllables, stress on the 2nd" in t and ev("__prompts.length")==0,t)
+    pg.click("#pv [data-a=uk]");pg.wait_for_timeout(700);chk("preview speaker speaks (device-voice fallback for blocked audio)",ev("__spoken.length")==1 and ev("__spoken[0].t")=="serene" and ev("__spoken[0].v")=="en-GB")
     # A: type word -> generate -> everything filled
     gen("serene");E=lambda n:pg.input_value(f"[name={n}]")
     chk("AI called once with the word, via quick tier",ev("__prompts.length")==1 and "“serene”" in ev("__prompts[0].i") and ev("__prompts[0].o.modelTier")=="quick")
     chk("definition/pos/synonyms/antonyms/example generated",E("pos")=="adjective" and "Calm, peaceful" in E("def") and E("syn")=="calm, tranquil, peaceful, placid" and E("ant")=="agitated, stormy" and "serene" in E("ex"),str([E("pos"),E("def"),E("syn"),E("ant"),E("ex")]))
     chk("IPA + audio come from the dictionary",E("ipaUK")=="/sɪˈriːn/" and E("ipaUS")=="/sɪˈriːn/" and E("pron")=="/sɪˈriːn/" and E("audioUK").endswith("serene-uk.mp3") and E("audioUS").endswith("serene-us.mp3"))
+    sy=pg.inner_text("#say");chk("'How to say it' box after generating","How to say it" in sy and "sih-REEN" in sy and "2 syllables, stress on the 2nd" in sy and pg.locator("#say .spk").count()==2 and pg.locator("#pv").is_hidden(),sy)
+    pg.click("#say [data-a=us]");pg.wait_for_timeout(500);chk("say-box speaker works",ev("__spoken.at(-1).t")=="serene" and ev("__spoken.at(-1).v")=="en-US")
     st=pg.inner_text("#genst");chk("status shows both sources","written by Claude" in st and "Pronunciation found" in st,st)
     chk("review + save now visible, button becomes Regenerate",pg.locator("#review").is_visible() and pg.locator("#save").is_visible() and pg.locator("#genbtn").inner_text()=="Regenerate")
     pg.click("#save");pg.wait_for_timeout(100);S=W("serene")
@@ -59,8 +65,10 @@ with sync_playwright() as p:
     chk("dictionary IPA without audio: kept, audio empty, honest status",E("ipaUK")=="" and E("pron")=="/ɡliːm/" and E("audioUK")=="" and "No recorded audio" in pg.inner_text("#genst"))
     pg.click("#save");pg.wait_for_timeout(100)
     # C: dictionary unreachable, AI works
-    opn();gen("offline");st=pg.inner_text("#genst")
+    opn();pg.fill("#f_term","offline");pg.wait_for_selector("#pv:not([hidden])",timeout=4000);t=pg.inner_text("#pv");chk("preview with no dictionary: nothing invented, speakers + hint","unavailable" in t and "Press Generate for the meaning" in t and "device voice" in t and "sound" not in t.replace("device voice",""),t)
+    gen("offline");st=pg.inner_text("#genst")
     chk("pronunciation unavailable, entry still generated",E("def").startswith("Not connected") and "Pronunciation unavailable" in st and "can’t be reached" in st and E("ipaUK")=="" and E("ipaUS")=="" and E("pron")=="" and pg.input_value("[name=ipaUK]")=="" and pg.get_attribute("[name=pron]","placeholder")=="unavailable",st)
+    sy=pg.inner_text("#say");chk("'How to say it' is honest when pronunciation is unavailable","unavailable (no IPA found)" in sy and "approximate spelling" not in sy and pg.locator("#say .spk").count()==2,sy)
     pg.click("#save");pg.wait_for_timeout(100);O=W("offline");chk("no IPA/audio invented when lookup fails",O["pron"]=="" and O["ipaUK"]=="" and O["ipaUS"]=="" and O["audioUK"]=="" and O["syl"]==0)
     pg.click("#cards details.dict summary >> nth=0") if False else None
     card=lambda t:pg.locator("#cards .wcard",has=pg.locator("h3",has_text=t))
@@ -89,7 +97,7 @@ with sync_playwright() as p:
     # J/M: edit -> Regenerate; failed pronunciation keeps saved IPA
     ev("(()=>{window.__aiImpl=async inp=>({pos:'adjective',definition:'Peaceful and free from worry or noise.',synonyms:['calm'],antonyms:[],example:'She had a serene expression after the storm passed.'});return 1})()")
     pg.click('button[aria-label="Edit serene"]');chk("edit opens the review directly",pg.locator("#review").is_visible() and pg.locator("#genbtn").inner_text()=="Regenerate" and E("def").startswith("Calm"))
-    DICT_FAIL[0]=True;pg.click("#genbtn");pg.wait_for_function("!document.getElementById('genbtn').disabled");pg.wait_for_timeout(80)
+    ev("(()=>{DC={};return 1})()");DICT_FAIL[0]=True;pg.click("#genbtn");pg.wait_for_function("!document.getElementById('genbtn').disabled");pg.wait_for_timeout(80)
     chk("regenerate rewrites text, keeps saved IPA when lookup fails",E("def").startswith("Peaceful") and E("ipaUK")=="/sɪˈriːn/" and E("audioUS").endswith("serene-us.mp3") and "Pronunciation unavailable" in pg.inner_text("#genst"));DICT_FAIL[0]=False
     pg.click("#save");pg.wait_for_timeout(100);S2=W("serene");chk("edited entry persisted, same id, progress fields intact",S2["id"]==S["id"] and S2["def"].startswith("Peaceful") and S2["added"]==S["added"] and S2["box"]==0)
     # integration
