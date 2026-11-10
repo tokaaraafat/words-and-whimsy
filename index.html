@@ -264,7 +264,7 @@ dialog::backdrop{background:rgba(30,15,30,.6)}
 .row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
 @media(max-width:860px){.prow small{margin-left:0;width:100%}.row3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row3 .fld:first-child{grid-column:1/-1}}
 @media (prefers-reduced-motion:reduce){.spk,.spk svg{animation:none!important}}
-.vsw{display:flex;align-items:center;gap:8px;font:600 15px var(--sans);flex-wrap:wrap}.q .spk{width:28px;height:28px;min-width:28px;margin:0 8px 0 0}.q .spk svg{width:15px;height:15px}.mini .spk{width:28px;height:28px;min-width:28px}.genrow{display:flex;gap:10px}.genrow input{flex:1;min-width:0;font:400 20px var(--serif);background:var(--surface);color:var(--text);border:1.5px solid var(--line);border-radius:12px;padding:10px 14px}.gst{list-style:none;padding:0;margin:0;display:grid;gap:4px;font:500 15px/1.4 var(--serif)}.gst li::before{display:inline-block;width:1.4em;font-weight:700}.gst li.ok::before{content:"✓";color:var(--sage)}.gst li.bad{color:var(--burg)}.gst li.bad::before{content:"!"}.gst li.run::before{content:"…";animation:gp 1s ease-in-out infinite alternate}@keyframes gp{to{opacity:.3}}:root[data-theme="dark"] .gst li.bad{color:#FF9DB1}.linkbtn{justify-self:start;background:none;border:0;color:var(--violet);text-decoration:underline;cursor:pointer;font:600 14px var(--sans);padding:0}@media(max-width:860px){.genrow{flex-wrap:wrap}.genrow input{flex-basis:100%}}dialog{margin:auto;max-height:calc(100vh - 24px)}.pv,.say{background:var(--parch);border:1px solid var(--line);border-left:5px double var(--gold);border-radius:4px 10px 10px 4px;padding:12px 16px;font-family:var(--serif)}.pv .prow .spk,.say .spk{margin-left:0}.saytop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.saytop b{font:700 19px var(--hand);color:var(--violet);margin-right:6px}.say .rsp{font-size:26px}.pv .def{font:400 17px/1.5 var(--serif);margin:8px 0 0}</style>
+.vsw{display:flex;align-items:center;gap:8px;font:600 15px var(--sans);flex-wrap:wrap}.q .spk{width:28px;height:28px;min-width:28px;margin:0 8px 0 0}.q .spk svg{width:15px;height:15px}.mini .spk{width:28px;height:28px;min-width:28px}.genrow{display:flex;gap:10px}.genrow input{flex:1;min-width:0;font:400 20px var(--serif);background:var(--surface);color:var(--text);border:1.5px solid var(--line);border-radius:12px;padding:10px 14px}.gst{list-style:none;padding:0;margin:0;display:grid;gap:4px;font:500 15px/1.4 var(--serif)}.gst li::before{display:inline-block;width:1.4em;font-weight:700}.gst li.ok::before{content:"✓";color:var(--sage)}.gst li.bad{color:var(--burg)}.gst li.bad::before{content:"!"}.gst li.run::before{content:"…";animation:gp 1s ease-in-out infinite alternate}@keyframes gp{to{opacity:.3}}:root[data-theme="dark"] .gst li.bad{color:#FF9DB1}.linkbtn{justify-self:start;background:none;border:0;color:var(--violet);text-decoration:underline;cursor:pointer;font:600 14px var(--sans);padding:0}@media(max-width:860px){.genrow{flex-wrap:wrap}.genrow input{flex-basis:100%}}dialog{margin:auto;max-height:calc(100vh - 24px)}.pv,.say{background:var(--parch);border:1px solid var(--line);border-left:5px double var(--gold);border-radius:4px 10px 10px 4px;padding:12px 16px;font-family:var(--serif)}.pv .prow .spk,.say .spk{margin-left:0}.saytop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.saytop b{font:700 19px var(--hand);color:var(--violet);margin-right:6px}.say .rsp{font-size:26px}.pv .def{font:400 17px/1.5 var(--serif);margin:8px 0 0}#bktext{width:100%;min-height:150px;margin:10px 0;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--text);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px}.meta.bad{color:var(--burg)}:root[data-theme="dark"] .meta.bad{color:#FF9DB1}</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -297,7 +297,7 @@ dialog::backdrop{background:rgba(30,15,30,.6)}
   <li><a href="#passport" data-nav="passport"><svg class="i"><use href="#chart"/></svg>Passport</a></li>
   <li><a href="#pages" data-nav="pages"><svg class="i"><use href="#cal"/></svg>Pages</a></li>
  </ul></nav>
- <div class="streak"><svg class="sp" style="color:#9DB88A"><use href="#sprig"/></svg><b id="streakN">0 days</b><span>of adding words in a row</span></div>
+ <div class="streak"><svg class="sp" style="color:#9DB88A"><use href="#sprig"/></svg><b id="streakN">0 days</b><span>of learning in a row</span></div>
 </aside>
 
 <main>
@@ -397,7 +397,17 @@ dialog::backdrop{background:rgba(30,15,30,.6)}
   <div class="note plain"><h4 class="mh" style="margin:0 0 8px">Insert one of your words</h4><input type="search" id="jq" placeholder="Search your words" aria-label="Search words to insert" style="width:100%;font:400 16px var(--sans);color:var(--text);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px"><div class="chips" id="jpick"></div></div>
   <div class="note plain"><h4 class="mh" style="margin:0 0 4px">Past pages</h4><div id="jlist"></div></div></div></div>
 </section>
-<section id="vPass" hidden><div id="passb"></div></section>
+<section id="vPass" hidden><div id="passb"></div>
+<div class="note plain" style="margin-top:30px"><span class="tape lav"></span><h4 class="mh" style="margin:0 0 6px">Backup and restore</h4>
+ <p class="gh" style="margin:0">Your words are stored only in this browser. Save a backup file now and then, so you can restore them after clearing your data or on another device.</p>
+ <p class="meta" id="bkst"></p>
+ <div class="rate" style="justify-content:flex-start"><button class="btn" data-act="bkexp">Export backup</button><button class="btn ghost" data-act="bkimp">Restore from a file</button><button class="btn ghost sm" data-act="bkbox">Backup as text</button></div>
+ <input type="file" id="bkfile" accept=".json,application/json" hidden aria-label="Choose a backup file">
+ <div id="bkbox" hidden><textarea id="bktext" aria-label="Backup text" spellcheck="false" placeholder="Backup text appears here. To restore from text, paste it here and press Preview."></textarea><div class="rate" style="justify-content:flex-start"><button class="btn ghost sm" data-act="bkcopy">Copy text</button><button class="btn ghost sm" data-act="bkpv">Preview restore from this text</button></div></div>
+ <p class="meta" id="bkmsg" role="status"></p>
+ <div class="rate" id="bkgo" style="justify-content:flex-start" hidden><button class="btn" data-act="bkgo">Restore now</button><button class="btn ghost" data-act="bkno">Cancel</button></div>
+</div>
+</section>
 <section id="vPages" hidden><div class="libhead"><h2 class="rib pink" style="margin:0">Daily pages</h2></div><div id="pageb"></div></section>
 <dialog id="dpr" aria-label="Pronunciation practice"><div class="dbody"><h2>Pronunciation practice</h2><div class="entry" id="prbody"></div><div class="acts"><button class="btn ghost" data-act="close">Close</button><button class="btn ghost" data-act="pnext">Next word</button><button class="btn" data-act="pdone">Mark as practiced</button></div></div></dialog>
 <dialog id="dlg" aria-labelledby="dtitle"><form id="wf" class="dbody" novalidate>
@@ -522,6 +532,26 @@ function cleanGen(o,term){if(!o||typeof o!=="object")return{ok:false,err:"bad"};
 function fromDict(o,term){var t=[{id:"t",term:term}],ms=(o.meanings||[]).filter(function(m){return T(m.def)}),m=ms.filter(function(m){return m.ex&&usedIn(m.ex,t).length})[0]||ms[0];if(!m)return null;
  var cl=function(a){return(a||[]).map(T).filter(function(x,i,r){return x&&norm(x)!==norm(term)&&r.indexOf(x)===i}).slice(0,6)};
  return{pos:POS.indexOf(m.pos)>-1?m.pos:"",def:T(m.def),syn:cl(m.syn),ant:cl(m.ant),ex:m.ex&&usedIn(m.ex,t).length?T(m.ex):""}}
+function setH(h){try{localStorage.setItem(HKEY,JSON.stringify(h.slice(-3000)))}catch(e){ok=false}}
+function buildBackup(ws,h,es,set,now){return{app:"words-and-whimsy",version:1,exported:new Date(now).toISOString(),words:ws,history:h,journal:es}}
+function cleanJ(e){if(!e||typeof e!=="object"||typeof e.id!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(e.date)||!T(e.body))return null;var n=new Date().toISOString();return{id:e.id,date:e.date,title:String(e.title||""),body:String(e.body),prompt:String(e.prompt||""),created:String(e.created||n),updated:String(e.updated||e.created||n)}}
+function parseBackup(text){var d;try{d=JSON.parse(text)}catch(x){return{ok:false,err:"That isn’t a valid backup (it couldn’t be read)."}}
+ if(!d||typeof d!=="object"||d.app!=="words-and-whimsy"||typeof d.version!=="number")return{ok:false,err:"This doesn’t look like a Words & Whimsy backup."};
+ if(d.version>1)return{ok:false,err:"This backup comes from a newer version of the app."};
+ if(!Array.isArray(d.words)||d.words.length>20000)return{ok:false,err:"The backup has no usable word list."};
+ var ws=d.words.filter(function(w){return w&&typeof w==="object"&&/^[A-Za-z][A-Za-z' -]*$/.test(T(w.term))&&T(w.term).length<=60}).map(fix),
+ h=(Array.isArray(d.history)?d.history:[]).filter(function(x){return x&&typeof x.w==="string"&&!isNaN(Date.parse(x.t))&&["good","hard","bad"].indexOf(x.r)>-1}).map(function(x){return{w:x.w,t:new Date(x.t).toISOString(),k:String(x.k||""),r:x.r}}),
+ es=(Array.isArray(d.journal)?d.journal:[]).map(cleanJ).filter(Boolean);
+ return{ok:true,data:{words:ws,history:h,journal:es},skipped:d.words.length-ws.length}}
+function mergeBackup(cur,inc){var idx={},tix={},ws=cur.words.slice(),added=0,upd=0,dup=0,rm={};
+ ws.forEach(function(w,i){idx[w.id]=i;tix[norm(w.term)]=w.id});
+ inc.words.forEach(function(w){if(idx[w.id]!==undefined){var i=idx[w.id];if(w.updated>ws[i].updated){ws[i]=w;upd++}}else if(tix[norm(w.term)]){dup++;rm[w.id]=tix[norm(w.term)]}else{ws.push(w);idx[w.id]=ws.length-1;tix[norm(w.term)]=w.id;added++}});
+ var hk={},h=cur.history.slice(),ar=0;h.forEach(function(e){hk[e.w+"|"+e.t+"|"+e.k]=1});
+ inc.history.forEach(function(e){var x={w:rm[e.w]||e.w,t:e.t,k:e.k,r:e.r},k=x.w+"|"+x.t+"|"+x.k;if(!hk[k]){hk[k]=1;h.push(x);ar++}});h.sort(function(a,b){return a.t<b.t?-1:a.t>b.t?1:0});
+ var jx={},j=cur.journal.slice(),ap=0;j.forEach(function(e,i){jx[e.id]=i});
+ inc.journal.forEach(function(e){if(jx[e.id]!==undefined){var i=jx[e.id];if(e.updated>j[i].updated)j[i]=e}else{j.push(e);jx[e.id]=j.length-1;ap++}});
+ return{words:ws,history:h.slice(-3000),journal:j,added:{words:added,reviews:ar,pages:ap},updated:upd,skippedDup:dup}}
+function lastChange(ws,h,es){var m="";ws.forEach(function(w){if(w.updated>m)m=w.updated});h.forEach(function(e){if(e.t>m)m=e.t});es.forEach(function(e){var u=e.updated||e.created||"";if(u>m)m=u});return m}
 /*END*/
 var $=function(s){return document.querySelector(s)},words=load(),editId=null,delId=null,F={q:"",pos:"",fav:false,sort:"new"},tt;
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -541,7 +571,7 @@ function renderHome(){var n=words.length,now=new Date(),h=now.getHours();
  $("#hi").textContent=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
  $("#greetP").textContent=n?"You have "+n+" word"+(n>1?"s":"")+" in your journal. Take your tea and read a few.":"Your journal is empty. Add your first word to begin.";
  $("#sTotal").textContent=n;$("#sFav").textContent=words.filter(function(w){return w.fav}).length;$("#sMine").textContent=words.filter(function(w){return w.mine}).length;
- var s=streak(words);$("#streakN").textContent=s+(s===1?" day":" days");
+ var s=streaks(actDays(words,loadH(),J),Date.now()).cur;$("#streakN").textContent=s+(s===1?" day":" days");
  if(n){var w=words[Math.floor((Date.now()-now.getTimezoneOffset()*6e4)/864e5)%n];
   $("#wod").innerHTML='<button class="flip note plain" id="flip" aria-pressed="false" aria-label="Word card: '+esc(w.term)+'. Press to reveal the meaning."><span class="tape"></span><span class="in"><span class="face front"><span class="tag">'+esc(w.pos)+'</span><h3>'+esc(w.term)+'</h3><span class="pron">'+esc(w.pron)+'</span>'+'<span class="hint">tap to turn the page</span></span><span class="face back"><span class="tag">'+esc(w.pos)+'</span><h3>'+esc(w.term)+'</h3><span class="def">'+esc(w.def)+'</span>'+(w.ex?'<em>'+esc(w.ex)+'</em>':"")+'<span class="hint">tap to turn back</span></span></span></button>'}
  else $("#wod").innerHTML='<div class="note plain wodq"><span class="tape"></span><p>No word of the day yet. Save a word and it will appear here.</p><button class="btn" data-act="add">Add your first word</button></div>';
@@ -683,6 +713,23 @@ function gen(){var E=form.elements,term=T(E.term.value),n=++GEN.n,v=validate({te
   else["pron","ipaUK","ipaUS"].forEach(function(k){E[k].placeholder="unavailable"});
   drawSt(s);$("#genbtn").disabled=false;if(notw){return}
   if(f)fillGen(f);reveal();$("#pv").hidden=true;$("#pdet").open=true;$("#genmsg").textContent=f?"":"Nothing could be generated, so please type the entry yourself."})}
+var BK={pending:null};
+function bkMsg(t,bad){var m=$("#bkmsg");m.textContent=t;m.className="meta"+(bad?" bad":"")}
+function bkStamp(){SET.lastBackup=new Date().toISOString();saveSet(SET);renderBk()}
+function renderBk(){var h=loadH(),has=words.length||J.length||h.length,l=SET.lastBackup;$("#bkst").textContent=!has?"Nothing to back up yet.":!l?"You haven’t made a backup yet.":"Last backup: "+new Date(l).toLocaleString()+(lastChange(words,h,J)>l?". You have changes since then.":". Everything is backed up.")}
+function bkText(){return JSON.stringify(buildBackup(words,loadH(),J,SET,Date.now()),null,2)}
+function bkExport(){BK.pending=null;$("#bkgo").hidden=true;var txt=bkText(),name="words-and-whimsy-backup-"+ymd(new Date())+".json",fb=function(m){$("#bkbox").hidden=false;$("#bktext").value=txt;bkMsg(m)},D=null;
+ if(!window.claude){try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"application/json"}));a.download=name;document.body.appendChild(a);a.click();a.remove();bkStamp();bkMsg("Backup downloaded as "+name+". Check your downloads folder.");return}catch(e){}fb("Your browser blocked the download. Copy the text below into a file named "+name+".");return}
+ try{D=claude.use("downloads")}catch(e){}
+ Promise.resolve(D).then(function(d){if(!d){fb("This view can’t save files. Copy the text below into a file named "+name+".");return}
+  d.save({filename:name,data:txt}).then(function(){bkStamp();bkMsg("Backup saved as "+name+".")},function(e){if(e&&e.code==="declined")bkMsg("Backup not saved (you declined).");else fb("Saving a file isn’t available here. Copy the text below into a file named "+name+".")})},function(){fb("Saving a file isn’t available here. Copy the text below into a file named "+name+".")})}
+function bkCopy(){var t=$("#bktext");t.select();var done=function(){bkStamp();bkMsg("Copied. Paste it into a text file and keep it somewhere safe.")},bad=function(){bkMsg("Press Ctrl+C (or Cmd+C) to copy the selected text, then paste it into a file.")};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t.value).then(done,bad);else bad()}
+function bkPreview(text){var r=parseBackup(text);$("#bkgo").hidden=true;BK.pending=null;if(!r.ok){bkMsg(r.err,true);return}
+ var m=mergeBackup({words:words,history:loadH(),journal:J},r.data);BK.pending=m;
+ bkMsg("This backup has "+r.data.words.length+" words, "+r.data.history.length+" reviews and "+r.data.journal.length+" pages. Restoring will add "+m.added.words+" new words, update "+m.updated+" with newer versions, and add "+m.added.reviews+" reviews and "+m.added.pages+" pages."+(m.skippedDup?" "+m.skippedDup+" already exist and are kept.":"")+(r.skipped?" "+r.skipped+" unreadable entries were skipped.":"")+" Nothing is deleted.");$("#bkgo").hidden=false}
+function bkApply(){var m=BK.pending;if(!m)return;words=m.words;if(!save(words))warn();setH(m.history);J=m.journal;saveJ(J);BK.pending=null;$("#bkgo").hidden=true;render();bkMsg("Restored: "+m.added.words+" words added, "+m.updated+" updated, "+m.added.reviews+" reviews and "+m.added.pages+" pages added.")}
+function bkFile(f){if(!f)return;var r=new FileReader();r.onload=function(){bkPreview(String(r.result))};r.onerror=function(){bkMsg("That file couldn’t be read.",true)};r.readAsText(f)}
 var S={mode:"home"},LBL={e2d:"What does it mean?",d2w:"Which word fits?",syn:"Find the synonym",cloze:"Complete the sentence"};
 function mini(w){return'<div class="mini"><b>'+esc(w.term)+'</b>'+spkW(w)+' <i>'+esc(w.pron)+'</i>'+'<p>'+esc(w.def)+'</p>'+(w.ex?'<p class="q">'+sp(w.ex)+esc(w.ex)+'</p>':"")+'</div>'}
 function renderStudy(){if(S.mode==="run")return;var el=$("#stbody"),now=Date.now(),n=words.length,h,c={new:0,learning:0,mastered:0},rs=rstats(loadH(),now),due=0,mx=1;
@@ -724,7 +771,7 @@ function renderGarden(){var ws=words.slice().sort(function(a,b){return a.added.l
  $("#legend").innerHTML=[["noun","Nouns","roses"],["verb","Verbs","tulips"],["adjective","Adjectives","daisies"],["adverb","Adverbs","lavender"],["phrase","All other types","cosmos"]].map(function(g){return'<span class="lg">'+flower({pos:g[0],mastered:true,id:"x"})+g[1]+": "+g[2]+'</span>'}).join("");
  $("#beds").innerHTML=ws.length?ws.map(function(w){var h=hash(w.id);return'<button class="fl'+(w.mastered?" bloom":"")+'" data-act="open" data-id="'+w.id+'" style="--c:'+(PC[w.pos]||"#C7A57A")+';--s:'+(.86+h%24/100)+';--d:'+(4+h%30/10)+'s;--dl:-'+(h%50/10)+'s" aria-label="'+esc(w.term)+', '+(w.mastered?"in bloom":"a bud")+'. Open details">'+flower(w,w.id===justId)+'<span class="lab">'+esc(w.term)+'</span></button>'}).join(""):'<div class="none" style="grid-column:1/-1;grid-row:1;color:var(--lab)"><span>The garden is bare. Every word you save plants a bud.</span><button class="btn" data-act="add">Plant your first word</button><button class="btn ghost" data-act="sample">Add 3 sample words</button></div>';
  justId=null}
-function render(){renderHome();renderLib();renderGarden();renderStudy();renderDesk();renderPass();renderPages();planUpd();if(viewId)fillView()}
+function render(){renderHome();renderLib();renderGarden();renderStudy();renderDesk();renderPass();renderPages();planUpd();renderBk();if(viewId)fillView()}
 
 function route(){var v={"#library":"library","#garden":"garden","#study":"study","#desk":"desk","#passport":"passport","#pages":"pages"}[location.hash]||"home";$("#vGarden").hidden=v!=="garden";$("#vStudy").hidden=v!=="study";$("#vDesk").hidden=v!=="desk";$("#vPass").hidden=v!=="passport";$("#vPages").hidden=v!=="pages";planUpd();$("#vHome").hidden=v!=="home";$("#vLib").hidden=v!=="library";
  document.querySelectorAll("[data-nav]").forEach(function(a){if(a.dataset.nav===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});window.scrollTo(0,0)}
@@ -742,7 +789,7 @@ document.addEventListener("click",function(ev){var b=ev.target.closest("[data-ac
  if(f&&!b){f.setAttribute("aria-pressed",f.getAttribute("aria-pressed")==="true"?"false":"true");return}
  var s=ev.target.closest(".stack");if(s&&s.dataset.pos){F.pos=s.dataset.pos;$("#fpos").value=F.pos;renderLib()}
  if(!b)return;var a=b.dataset.act,id=b.dataset.id,w=words.filter(function(x){return x.id===id})[0];
- if(a==="pvsay"){say(PV.term,b.dataset.a,PV.o?(b.dataset.a==="uk"?PV.o.audioUK:PV.o.audioUS):"",b)}else if(a==="gen")gen();else if(a==="manual"){reveal();$("#genbtn").textContent="Generate";$("#pdet").open=false;$("#genmsg").textContent="";form.elements.def.focus()}else if(a==="say")sayBtn(b);else if(a==="replay"){if(LAST)say(LAST[0],LAST[1],LAST[2],b)}else if(a==="acc"){SET.accent=b.dataset.a;saveSet(SET);syncSeg()}else if(a==="slow"){SET.slow=!SET.slow;saveSet(SET);syncSeg()}else if(a==="lookup")lookupW(id);else if(a==="flook")lookupForm();else if(a==="fsay")fsay(b.dataset.a);else if(a==="prac")openPrac(id);else if(a==="recask"){PRS.ask=true;drawPrac()}else if(a==="recgo")recGo();else if(a==="pdone")pDone();else if(a==="pnext")pNext();else if(a==="ins")ins(b.dataset.t);else if(a==="jsave")saveE();else if(a==="jnew")newE();else if(a==="jedit")editE(id);else if(a==="jdel")delE(id);else if(a==="jprompt"){D.pi++;D.pw=null;renderDesk()}else if(a==="jwordp"&&words.length){D.pw=words[Math.floor(Math.random()*words.length)].id;renderDesk()}else if(a==="jopen"){editE(id);location.hash="#desk"}else if(a==="pday")shiftD(+b.dataset.d);else if(a==="pgo"){PG=b.dataset.day;renderPages()}
+ if(a==="bkexp")bkExport();else if(a==="bkimp")$("#bkfile").click();else if(a==="bkbox"){BK.pending=null;$("#bkgo").hidden=true;$("#bkmsg").textContent="";$("#bkbox").hidden=false;$("#bktext").value=bkText()}else if(a==="bkcopy")bkCopy();else if(a==="bkpv")bkPreview($("#bktext").value);else if(a==="bkgo")bkApply();else if(a==="bkno"){BK.pending=null;$("#bkgo").hidden=true;bkMsg("Restore cancelled. Nothing was changed.")}else if(a==="pvsay"){say(PV.term,b.dataset.a,PV.o?(b.dataset.a==="uk"?PV.o.audioUK:PV.o.audioUS):"",b)}else if(a==="gen")gen();else if(a==="manual"){reveal();$("#genbtn").textContent="Generate";$("#pdet").open=false;$("#genmsg").textContent="";form.elements.def.focus()}else if(a==="say")sayBtn(b);else if(a==="replay"){if(LAST)say(LAST[0],LAST[1],LAST[2],b)}else if(a==="acc"){SET.accent=b.dataset.a;saveSet(SET);syncSeg()}else if(a==="slow"){SET.slow=!SET.slow;saveSet(SET);syncSeg()}else if(a==="lookup")lookupW(id);else if(a==="flook")lookupForm();else if(a==="fsay")fsay(b.dataset.a);else if(a==="prac")openPrac(id);else if(a==="recask"){PRS.ask=true;drawPrac()}else if(a==="recgo")recGo();else if(a==="pdone")pDone();else if(a==="pnext")pNext();else if(a==="ins")ins(b.dataset.t);else if(a==="jsave")saveE();else if(a==="jnew")newE();else if(a==="jedit")editE(id);else if(a==="jdel")delE(id);else if(a==="jprompt"){D.pi++;D.pw=null;renderDesk()}else if(a==="jwordp"&&words.length){D.pw=words[Math.floor(Math.random()*words.length)].id;renderDesk()}else if(a==="jopen"){editE(id);location.hash="#desk"}else if(a==="pday")shiftD(+b.dataset.d);else if(a==="pgo"){PG=b.dataset.day;renderPages()}
  else if(a==="start")startS(+b.dataset.n);else if(a==="ans")ansS(+b.dataset.i);else if(a==="rate")rateS(b.dataset.r);else if(a==="next")nextS();else if(a==="stend")finS();else if(a==="stback"){S.mode="home";renderStudy()}
  else if(a==="open"){viewId=id;fillView();$("#dview").showModal()}
  else if(a==="mast"&&w){justId=w.mastered?null:id;commit(words.map(function(x){return x.id===id?Object.assign({},x,{mastered:!x.mastered,updated:new Date().toISOString()}):x}),w.mastered?"“"+w.term+"” is a bud again. Time to revisit it.":"“"+w.term+"” is in full bloom")}
@@ -769,6 +816,7 @@ document.addEventListener("change",function(e){if(e.target.id==="goal"){SET.goal
 for(var k=0;k<9;k++){var ff=document.createElement("i");ff.className="ff";ff.style.cssText="--x:"+(k*11+5)%96+"%;--y:"+(30+k*17%55)+"%;--t:"+(5+k%4*1.7)+"s;--dl:-"+k*1.3+"s";$("#scene").appendChild(ff)}
 $("#f_term").addEventListener("input",function(){clearTimeout(pvT);var t=T(this.value),n=++PVN;$("#pv").hidden=true;if(!/^[A-Za-z][A-Za-z' -]{1,59}$/.test(t))return;pvT=setTimeout(function(){PV={term:t,o:null};fetchDict(t).then(function(o){if(n!==PVN||!$("#review").hidden&&editId)return;PV.o=o;pvDraw(t,o)},function(){if(n!==PVN)return;pvDraw(t,null)})},550)});
 ["ipaUK","ipaUS","pron","resp","syl","stress"].forEach(function(k){form.elements[k].addEventListener("input",drawSay)});
+$("#bkfile").addEventListener("change",function(e){bkFile(e.target.files[0]);e.target.value=""});
 try{speechSynthesis.addEventListener("voiceschanged",loadV)}catch(e){}loadV();
 window.addEventListener("hashchange",route);warn();route();render();
 

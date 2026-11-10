@@ -9,6 +9,7 @@ A personal English vocabulary journal with a vintage literary design. Type a wor
 - **Word Garden**: every word is a flower; mastered words bloom.
 - **Memory Lane**: flashcards, meaning/word/synonym/sentence-completion questions, spaced repetition.
 - **Literary Desk**, **Word Passport**, **Daily Pages**: journal, statistics, and day-by-day history.
+- **Backup and restore** (Word Passport page): export all words, reviews and journal pages to a `.json` file; restore by merging a backup into the current data (nothing is deleted, newer edits win, duplicate words are not created).
 - Everything is saved in the browser (`localStorage`). No account, no backend.
 
 ## Run
@@ -26,8 +27,9 @@ pip install playwright && playwright install chromium
 python3 tests/e2e_regression.py         # full app regression
 python3 tests/e2e_pronunciation.py      # audio, voices, practice (simulated)
 python3 tests/e2e_generation.py         # generate workflow (simulated AI/dictionary)
+python3 tests/e2e_backup.py             # streak consistency, export, restore, merge
 ```
 Services are simulated in the tests; real dictionary and AI output are not exercised.
 
 ## Known limitations
-Data is per browser and device (no export/import yet). Syllable, stress and easy spelling are approximations derived from IPA. Speech recognition depends on the browser.
+Data is per browser and device; use Backup and restore to move it. Settings (goal, voice) are not included in backups. Syllable, stress and easy spelling are approximations derived from IPA. Speech recognition depends on the browser.
