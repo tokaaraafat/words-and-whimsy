@@ -12,6 +12,13 @@ A personal English vocabulary journal with a vintage literary design. Type a wor
 - **Backup and restore** (Word Passport page): export all words, reviews and journal pages to a `.json` file; restore by merging a backup into the current data (nothing is deleted, newer edits win, duplicate words are not created).
 - Everything is saved in the browser (`localStorage`). No account, no backend.
 
+## Install as an app (phone)
+Open the live site, then:
+- **iPhone (Safari):** Share, then **Add to Home Screen**.
+- **Android (Chrome):** menu, then **Install app**.
+
+It opens full screen with its own icon and also works offline. The installed app keeps its own storage, separate from the browser tab, so use **Backup and restore** (Word Passport page) to move existing words across.
+
 ## Run
 Open `index.html` in a browser, or serve the folder (`python3 -m http.server`).
 
